@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Registro de Horarios Universitarios</title>
+<style>
+:root{
+  --c1:#00594C; --c2:#77BC1F; --c3:#D6DF21; --c4:#C2622B; --ink:#141414; --bg:#FFFFFF; --panel:#FFFFFF; --line:#DDDDDD; --soft:#666666;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ink:#F1F1F1; --bg:#121212; --panel:#1B1B1B; --line:#333333; --soft:#AAAAAA; }}
+:root[data-theme="dark"]{ --ink:#F1F1F1; --bg:#121212; --panel:#1B1B1B; --line:#333333; --soft:#AAAAAA; }
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);font-size:14pt;}
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:"Arial Narrow","Liberation Sans Narrow",Arial,Helvetica,sans-serif;}
+h1,h2,h3,h4{font-weight:700;margin:0 0 6px;letter-spacing:.01em}
+header{position:sticky;top:0;padding-top:env(safe-area-inset-top,0px);background:var(--c1);color:#fff;z-index:5;}
+.hdrin{padding:14px 16px 0;}
+.hdrin h1{color:#fff;font-size:1.3rem;margin:0}
+.hdrin p{margin:2px 0 10px;font-size:.82rem;color:#DCEBE7}
+.tabs{display:flex;gap:2px;overflow-x:auto;padding:0 10px}
+.tabbtn{background:transparent;border:none;color:#DCEBE7;padding:10px 12px;font-size:.9rem;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-family:inherit}
+.tabbtn.active{color:#fff;border-color:var(--c3)}
+main{max-width:980px;margin:0 auto;padding:16px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px;margin-bottom:16px;}
+.cardhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.soft{color:var(--soft);font-size:.82rem}
+.row{display:flex;align-items:center}
+.wrap{flex-wrap:wrap}
+.gap8{gap:8px}
+.inp{padding:8px 10px;border:1px solid var(--line);border-radius:3px;background:var(--bg);color:var(--ink);font-size:.9rem;min-width:0;font-family:inherit}
+.inp.sm{width:90px}
+.chk{display:flex;align-items:center;gap:5px;font-size:.86rem}
+.btn{background:var(--c1);color:#fff;border:none;border-radius:3px;padding:8px 16px;font-size:.9rem;cursor:pointer;font-weight:700;font-family:inherit}
+.btn.sm{padding:7px 10px;font-size:.82rem}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:3px;padding:6px 10px;cursor:pointer;font-size:.82rem;font-family:inherit}
+.ghost.sm{padding:3px 8px;font-size:.78rem}
+.ghost.danger{color:var(--c4);border-color:var(--c4)}
+table.tbl{width:100%;border-collapse:collapse;margin:10px 0;font-size:.86rem}
+table.tbl th,table.tbl td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.tbl th{color:var(--soft);font-weight:700;font-size:.78rem}
+.addrow{margin-top:8px;align-items:center}
+.semgrid{display:flex;flex-wrap:wrap;gap:8px 14px;margin:10px 0}
+@keyframes filtroFade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.filtro-anim{animation:filtroFade .25s ease}
+.semchk{font-size:.84rem;display:flex;gap:5px;align-items:center}
+.sembox{border-top:1px dashed var(--line);padding-top:10px;margin-top:10px}
+.badge{display:inline-block;border-radius:3px;padding:2px 8px;font-size:.72rem;font-weight:700;margin-left:5px}
+.badge.shared{background:var(--c2);color:#0A2A00}
+.badge.lab{background:var(--c3);color:#2A2A00}
+.badge.completo{background:var(--c2);color:#0A2A00;font-size:.78rem;padding:3px 10px}
+.badge.pendiente{background:var(--c4);color:#fff;font-size:.78rem;padding:3px 10px}
+.estado-asignacion{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:5px;font-size:.86rem;font-weight:700;margin:10px 0}
+.estado-asignacion.completo{background:var(--c2);color:#0A2A00}
+.estado-asignacion.pendiente{background:var(--c4);color:#fff}
+.progreso-linea{display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:600;margin:10px 0}
+.gridwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table.grid{border-collapse:collapse;font-size:.78rem;min-width:520px}
+table.grid th,table.grid td{border:1px solid var(--line);padding:0;text-align:center}
+table.grid th{background:var(--bg);color:var(--soft);padding:6px 4px;font-weight:700}
+table.grid td.timecol{background:var(--bg);color:var(--soft);padding:4px 6px;white-space:nowrap;font-size:.72rem}
+.cell{width:64px;height:38px;border:none;background:transparent;cursor:pointer;font-size:.72rem;color:var(--ink);width:100%;height:38px;font-family:inherit}
+.cell:hover{background:var(--bg)}
+.cell.on{background:var(--c1);color:#fff;font-weight:700}
+.cell.off{background:var(--line);cursor:not-allowed}
+.cell.busy-seccion{background:#af4035;color:#fff;cursor:not-allowed}
+.cell.busy-docente{background:#b8860b;color:#fff;cursor:not-allowed}
+.cell.busy-ambos{background:repeating-linear-gradient(45deg,#af4035,#af4035 6px,#b8860b 6px,#b8860b 12px);cursor:not-allowed}
+.cell:disabled{pointer-events:none}
+.leyenda{display:flex;flex-wrap:wrap;gap:14px;font-size:.76rem;color:var(--soft);margin:8px 0}
+.leyenda span{display:inline-flex;align-items:center;gap:5px}
+.leyenda i{display:inline-block;width:13px;height:13px;border-radius:2px}
+select.inp{min-width:170px}
+footer{text-align:center;color:var(--soft);font-size:.76rem;padding:24px 10px 40px}
+@media (max-width:600px){ .hdrin h1{font-size:1.1rem} .inp{width:100%} select.inp{min-width:0} }
+</style>
+</head>
+<body>
+<header>
+  <div class="hdrin">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h1>Registro de Horarios Universitarios</h1>
+      <p>Facultades, cursos, carreras, docentes y programación semanal</p></div>
+      <button id="btnTema" class="ghost sm" style="border-color:rgba(255,255,255,.5);color:#fff;flex-shrink:0" onclick="toggleTema()">🌙</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+</header>
+<main id="app"></main>
+<footer>
+  <p id="footNote" style="margin:0 0 4px">Los datos se guardan automáticamente.</p>
+  <p style="margin:0">Herramienta diseñada por la Facultad de Ingeniería · Desarrollada por Claude</p>
+</footer>
+<script>
+const DIAS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const TABS=[['config','Configuración'],['carreras','Facultades y carreras'],['cursos','Cursos'],['docentes','Docentes'],['horario','Horario'],['resumen','Resumen']];
+let db=null;
+let downloadsCap=null;
+let localEdited=false;
+const LS_KEY='horarios_universitarios_estado_v1';
+const hasClaudeHost=!!(window.claude&&typeof window.claude.use==='function');
+const TEMA_KEY='horarios_tema_v1';
+function temaActivo(){
+  const guardado=(()=>{ try{ return localStorage.getItem(TEMA_KEY); }catch(e){ return null; } })();
+  if(guardado==='dark'||guardado==='light') return guardado;
+  return (window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+}
+function aplicarTema(t){
+  document.documentElement.setAttribute('data-theme',t);
+  const btn=document.getElementById('btnTema'); if(btn) btn.textContent=t==='dark'?'☀️':'🌙';
+}
+function toggleTema(){
+  const nuevo=temaActivo()==='dark'?'light':'dark';
+  try{ localStorage.setItem(TEMA_KEY,nuevo); }catch(e){}
+  aplicarTema(nuevo);
+}
+aplicarTema(temaActivo());
+let state=defaultState();
+let ui={tab:'config',selFacultad:'',selCarrera:'',selSem:'',resCarId:'',resSemNum:'',resDocId:'',resDocPeriodo:'impar',editandoCurso:'',editandoDocente:'',filtroCarreraId:'',filtroSem:'',docPeriodo:'impar',verTodos:false};
+let cfgDraft=null;
+
+function defaultState(){return{
+  config:{minCred:50,dias:DIAS.map(n=>({nombre:n,activo:['Lun','Mar','Mié','Jue','Vie'].includes(n),periodos:8,horaInicio:'07:00'})),recesos:[{despues:2,dur:15,dias:['Lun','Mar','Mié','Jue','Vie']},{despues:5,dur:45,dias:['Lun','Mar','Mié','Jue','Vie']}]},
+  facultades:[],cursos:[],carreras:[],profesores:[],asign:[]
+};}
+function migrateConfig(cfg){
+  if(cfg&&Array.isArray(cfg.dias)&&cfg.dias[0]&&typeof cfg.dias[0]==='object'&&'horaInicio'in cfg.dias[0]) return{minCred:cfg.minCred||50,dias:cfg.dias,recesos:cfg.recesos||[{despues:2,dur:15},{despues:5,dur:45}]};
+  if(cfg&&Array.isArray(cfg.dias)&&cfg.dias[0]&&typeof cfg.dias[0]==='object'){
+    const gh=cfg.horaInicio||'07:00';
+    return{minCred:cfg.minCred||50,dias:cfg.dias.map(d=>({...d,horaInicio:gh})),recesos:cfg.recesos||[{despues:2,dur:15},{despues:5,dur:45}]};
+  }
+  const activos=(cfg&&cfg.diasActivos)||['Lun','Mar','Mié','Jue','Vie'];
+  const gh=(cfg&&cfg.horaInicio)||'07:00';
+  return{minCred:(cfg&&cfg.minCred)||50,dias:DIAS.map(n=>({nombre:n,activo:activos.includes(n),periodos:8,horaInicio:gh})),recesos:(cfg&&cfg.recesos)||[{despues:2,dur:15},{despues:5,dur:45}]};
+}
+function uid(){return Math.random().toString(36).slice(2,9);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmt(mins){mins=((mins%1440)+1440)%1440;let h=Math.floor(mins/60),m=mins%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
+function recesoAplicaDia(r,diaNombre){ return !diaNombre||!r.dias||!r.dias.length||r.dias.includes(diaNombre); }
+function periodTime(n,horaInicio,cfg,diaNombre){cfg=cfg||state.config;const[h,m]=horaInicio.split(':').map(Number);const base=h*60+m;let extra=0;for(const r of cfg.recesos)if(r.despues<n&&recesoAplicaDia(r,diaNombre))extra+=Number(r.dur);const start=base+(n-1)*cfg.minCred+extra;return fmt(start)+'–'+fmt(start+cfg.minCred);}
+function parityOf(s){return s%2===1?'impar':'par';}
+
+function loadFromLocalStorage(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw){ const d=JSON.parse(raw); state=Object.assign(defaultState(),d); state.config=migrateConfig(d.config); }
+  }catch(e){}
+}
+function saveToLocalStorage(){ try{ localStorage.setItem(LS_KEY,JSON.stringify(state)); }catch(e){} }
+async function boot(){
+  render();
+  if(hasClaudeHost){
+    try{ db=await claude.use('db'); }catch(e){ db=null; }
+  }
+  if(db){
+    try{
+      const snap=await db.doc('app/state').get();
+      if(!localEdited){
+        if(snap.exists){ const d=snap.data(); state=Object.assign(defaultState(),d); state.config=migrateConfig(d.config); }
+        else await db.doc('app/state').set(state);
+      }
+    }catch(e){}
+  } else if(!localEdited){
+    loadFromLocalStorage();
+  }
+  render();
+  if(hasClaudeHost){
+    try{ downloadsCap=await claude.use('downloads'); }catch(e){ downloadsCap=null; }
+    render();
+  }
+}
+function setExpMsg(t){ const m=document.getElementById('expMsg'); if(m)m.textContent=t; }
+function downloadPlano(filename,dataStr,mime){
+  const blob=new Blob([dataStr],{type:mime||'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+function csvEscape(v){ v=String(v==null?'':v); return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+function filasToCsv(filas){ return filas.map(f=>f.map(csvEscape).join(';')).join('\r\n'); }
+function labelPeriodoTexto(per,dias,cfg){ if(!dias.length)return String(per); return per+' ('+periodTime(per,dias[0].horaInicio,cfg,dias[0].nombre)+')'; }
+function filasReceso(per,dias,cfg){
+  return cfg.recesos.filter(r=>r.despues===per).map(r=>{
+    const fila=['Receso ('+r.dur+' min)'];
+    for(const d of dias) fila.push(recesoAplicaDia(r,d.nombre)?('Receso – '+r.dur+' min'):'');
+    return fila;
+  });
+}
+function filasExcelCarreraSem(car,s){
+  const dias=activeDias(),maxP=Math.max(1,...dias.map(d=>d.periodos));
+  const items=state.asign.filter(a=>seccionesOf(a).includes(car.id+'|'+s));
+  const label=a=>{const cu=state.cursos.find(x=>x.id===a.cursoId);return cu?cu.nombre:'';};
+  const docNom=id=>{const p=state.profesores.find(x=>x.uid===id);return p?p.nombre+(p.apellido?' '+p.apellido:''):'Sin asignar';};
+  const filas=[['Período',...dias.map(d=>d.nombre+' (desde '+d.horaInicio+')')]];
+  for(let per=1;per<=maxP;per++){
+    const fila=[labelPeriodoTexto(per,dias,state.config)];
+    for(const d of dias){
+      if(per>d.periodos){fila.push('');continue;}
+      const a=items.find(x=>x.slots.some(sl=>sl.dia===d.nombre&&sl.per===per));
+      fila.push(a?label(a)+' – '+docNom(a.docenteId):'');
+    }
+    filas.push(fila);
+    filas.push(...filasReceso(per,dias,state.config));
+  }
+  return filas;
+}
+function filasExcelDocente(pid,periodo){
+  const dias=activeDias(),maxP=Math.max(1,...dias.map(d=>d.periodos));
+  const items=state.asign.filter(a=>a.parity===periodo&&a.docenteId===pid);
+  const label=a=>{const cu=state.cursos.find(x=>x.id===a.cursoId);return cu?cu.nombre:'';};
+  const scopeTxt=a=>usosDe(a.cursoId,a.parity).map(u=>{const c=state.carreras.find(x=>x.id===u.carreraId);return c?c.nombre+' S'+u.sem:'';}).join(', ');
+  const filas=[['Período',...dias.map(d=>d.nombre+' (desde '+d.horaInicio+')')]];
+  for(let per=1;per<=maxP;per++){
+    const fila=[labelPeriodoTexto(per,dias,state.config)];
+    for(const d of dias){
+      if(per>d.periodos){fila.push('');continue;}
+      const here=items.filter(a=>a.slots.some(sl=>sl.dia===d.nombre&&sl.per===per));
+      fila.push(here.map(a=>label(a)+' – '+scopeTxt(a)).join(' / '));
+    }
+    filas.push(fila);
+    filas.push(...filasReceso(per,dias,state.config));
+  }
+  return filas;
+}
+async function exportarCsv(titulo,filas){
+  const contenido='\uFEFF'+filasToCsv(filas);
+  const filename=titulo.replace(/[\\/:*?"<>|]/g,'').trim().replace(/\s+/g,'_')+'.csv';
+  if(downloadsCap){
+    try{ await downloadsCap.save({filename,data:contenido}); }
+    catch(e){ if(!e||e.code!=='declined') alert('No se pudo exportar a Excel. Motivo: '+(e&&e.code?e.code:'desconocido')); }
+    return;
+  }
+  try{ downloadPlano(filename,contenido,'text/csv;charset=utf-8'); }
+  catch(e){ alert('No se pudo generar el archivo en este navegador.'); }
+}
+function exportarHorarioExcel(tipo,id,segundo){
+  if(tipo==='carrera'){
+    const car=state.carreras.find(c=>c.id===id); if(!car)return;
+    exportarCsv('Horario '+car.nombre+' Semestre '+segundo, filasExcelCarreraSem(car,Number(segundo)));
+  }else{
+    const p=state.profesores.find(x=>x.uid===id); if(!p)return;
+    exportarCsv('Horario '+p.nombre+' '+p.apellido+' '+(segundo==='impar'?'Semestres impares':'Semestres pares'), filasExcelDocente(id,segundo));
+  }
+}
+async function exportBackup(){
+  const fecha=new Date().toISOString().slice(0,10);
+  const filename=`horarios-respaldo-${fecha}.json`;
+  const dataStr=JSON.stringify(state,null,2);
+  if(downloadsCap){
+    setExpMsg('Preparando el archivo…');
+    try{
+      const r=await downloadsCap.save({filename,data:dataStr});
+      setExpMsg('Copia exportada correctamente (' + r.status + ').');
+    }catch(e){
+      const code=e&&e.code?e.code:'desconocido';
+      setExpMsg(code==='declined'?'Exportación cancelada.':'No se pudo exportar. Motivo: '+code+(e&&e.message?' — '+e.message:'')+'.');
+    }
+    return;
+  }
+  try{ downloadPlano(filename,dataStr); setExpMsg('Descarga iniciada: '+filename+' (revisa la carpeta de descargas del navegador).'); }
+  catch(e){ setExpMsg('No se pudo generar el archivo de respaldo en este navegador.'); }
+}
+function importBackup(input){
+  const file=input.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!confirm('Esto reemplazará todos los datos actuales con los del archivo importado. ¿Continuar?')){input.value='';return;}
+      state=Object.assign(defaultState(),data);
+      state.config=migrateConfig(data.config);
+      await persist();
+      setExpMsg('Copia de respaldo importada correctamente.');
+    }catch(e){ setExpMsg('El archivo no es una copia de respaldo válida.'); }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+async function persist(){ localEdited=true; render(); if(db){ try{ await db.doc('app/state').set(state); }catch(e){} } else { saveToLocalStorage(); } }
+function setTab(t){ if(t!=='config') cfgDraft=null; if(t!=='cursos') ui.editandoCurso=''; if(t!=='docentes') ui.editandoDocente=''; ui.tab=t; render(); }
+
+function render(){
+  document.getElementById('tabs').innerHTML=TABS.map(([k,l])=>`<button class="tabbtn ${ui.tab===k?'active':''}" onclick="setTab('${k}')">${l}</button>`).join('');
+  const foot=document.getElementById('footNote');
+  if(foot) foot.textContent=db?'Los datos se guardan automáticamente en tu cuenta.':'Los datos se guardan en este navegador (no se comparten entre dispositivos). Exporta copias de respaldo con regularidad.';
+  const app=document.getElementById('app');
+  if(ui.tab==='config') app.innerHTML=viewConfig();
+  else if(ui.tab==='carreras') app.innerHTML=viewCarreras();
+  else if(ui.tab==='cursos') app.innerHTML=viewCursos();
+  else if(ui.tab==='docentes') app.innerHTML=viewDocentes();
+  else if(ui.tab==='horario') app.innerHTML=viewHorario();
+  else app.innerHTML=viewResumen();
+}
+function renderConfigOnly(){ document.getElementById('app').innerHTML=viewConfig(); }
+
+/* ---------- CONFIG ---------- */
+function ensureDraft(){ if(!cfgDraft) cfgDraft=JSON.parse(JSON.stringify(state.config)); }
+function viewConfig(){
+  ensureDraft();
+  const c=cfgDraft;
+  return `<div class="card">
+    <h2>Parámetros generales</h2>
+    <p class="soft">Estos valores rigen el cálculo de todos los horarios de la herramienta: cuánto dura un período y cuántos hay por día. Cada crédito académico equivale a un período semanal.</p>
+    <div class="row wrap gap8">
+      <label class="chk">Minutos por crédito <input class="inp sm" type="number" min="1" value="${c.minCred}" onchange="cfgDraft.minCred=Math.max(1,Number(this.value)||50)"></label>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Días, hora de inicio y períodos</h2>
+    <p class="soft">Activa los días en que la institución imparte clases. Cada día puede tener su propia hora de inicio y su propia cantidad de períodos (por ejemplo, un sábado más corto que empiece más tarde).</p>
+    <table class="tbl"><thead><tr><th>Día</th><th>Activo</th><th>Hora de inicio</th><th>Períodos</th></tr></thead><tbody>
+    ${c.dias.map((d,i)=>`<tr><td>${d.nombre}</td><td><input type="checkbox" ${d.activo?'checked':''} onchange="cfgDraft.dias[${i}].activo=this.checked;renderConfigOnly()"></td><td>${d.activo?`<input class="inp sm" type="time" value="${d.horaInicio}" onchange="cfgDraft.dias[${i}].horaInicio=this.value">`:'—'}</td><td>${d.activo?`<input class="inp sm" type="number" min="1" value="${d.periodos}" onchange="cfgDraft.dias[${i}].periodos=Math.max(1,Number(this.value)||1)">`:'—'}</td></tr>`).join('')}
+    </tbody></table>
+  </div>
+  <div class="card">
+    <h2>Espacios de receso</h2>
+    <p class="soft">Se insertan después del período indicado, con duración en minutos.</p>
+    <table class="tbl"><thead><tr><th>Después del período</th><th>Duración (min)</th><th>Días</th><th></th></tr></thead><tbody>
+    ${c.recesos.map((r,i)=>`<tr><td>${r.despues}</td><td>${r.dur} min</td><td>${(r.dias&&r.dias.length)?r.dias.join(', '):'Todos los días activos'}</td><td><button class="ghost danger sm" onclick="cfgDraft.recesos.splice(${i},1);renderConfigOnly()">✕</button></td></tr>`).join('')||'<tr><td colspan="4" class="soft">Sin recesos configurados</td></tr>'}
+    </tbody></table>
+    <div class="row wrap gap8 addrow">
+      <input id="rc_desp" class="inp sm" type="number" min="1" placeholder="Período #">
+      <input id="rc_dur" class="inp sm" type="number" min="1" placeholder="Minutos">
+    </div>
+    <div class="row wrap gap8" style="margin-top:6px">
+      <span class="soft">Aplica a:</span>
+      ${c.dias.map(d=>`<label class="chk"><input type="checkbox" id="rc_dia_${d.nombre}" ${d.activo?'checked':''}> ${d.nombre}</label>`).join('')}
+    </div>
+    <div class="row wrap gap8 addrow">
+      <button class="btn sm" onclick="const d=Math.max(1,Number(document.getElementById('rc_desp').value)||0),u=Math.max(1,Number(document.getElementById('rc_dur').value)||0);if(!document.getElementById('rc_desp').value||!document.getElementById('rc_dur').value){alert('Indica el período y la duración.');return;}const dias=DIAS.filter(x=>document.getElementById('rc_dia_'+x).checked);if(!dias.length){alert('Selecciona al menos un día para este receso.');return;}cfgDraft.recesos.push({despues:d,dur:u,dias});renderConfigOnly();">Agregar receso</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Vista previa de períodos por día</h2>
+    <p class="soft">Horario estimado de cada período, según la hora de inicio y los recesos que apliquen a cada día activo.</p>
+    <div class="gridwrap"><table class="grid"><thead><tr><th>Día</th>${Array.from({length:10},(_,i)=>`<th>${i+1}</th>`).join('')}</tr></thead>
+    <tbody>${c.dias.filter(d=>d.activo).map(d=>`<tr><td class="timecol">${d.nombre}</td>${Array.from({length:10},(_,i)=>`<td class="timecol">${periodTime(i+1,d.horaInicio,c,d.nombre)}</td>`).join('')}</tr>`).join('')||'<tr><td class="soft" colspan="11">Activa al menos un día.</td></tr>'}</tbody></table></div>
+    <div class="row gap8" style="margin-top:12px"><button class="btn" onclick="guardarConfig()">Guardar configuración</button><span class="soft" id="cfgMsg"></span></div>
+  </div>
+  <div class="card">
+    <h2>Copia de respaldo</h2>
+    <p class="soft">Exporta toda la información (facultades, cursos, carreras, docentes y horarios) para conservarla, o impórtala para restaurarla. Si estás usando esta herramienta como archivo HTML abierto directamente en el navegador, los datos solo se guardan en ese navegador y ese dispositivo — exporta una copia con regularidad para no depender de un solo navegador.</p>
+    <div class="row wrap gap8">
+      <button class="btn sm" onclick="exportBackup()">Exportar copia de respaldo</button>
+      <label class="ghost sm" style="cursor:pointer">Importar copia de respaldo<input type="file" accept=".json,application/json" style="display:none" onchange="importBackup(this)"></label>
+    </div>
+    <p class="soft" id="expMsg" style="margin-top:8px"></p>
+  </div>`;
+}
+async function guardarConfig(){
+  state.config=JSON.parse(JSON.stringify(cfgDraft));
+  const porDia={}; for(const d of state.config.dias) porDia[d.nombre]=d.activo?d.periodos:0;
+  let quitados=0;
+  for(const a of state.asign){ const antes=a.slots.length; a.slots=a.slots.filter(sl=>(porDia[sl.dia]||0)>=sl.per); quitados+=antes-a.slots.length; }
+  pruneOrphanAsign();
+  await persist();
+  const m=document.getElementById('cfgMsg'); if(m)m.textContent=quitados>0?`Guardado ✓ (se quitaron ${quitados} período(s) de horario que ya no encajaban en la nueva configuración)`:'Guardado ✓';
+}
+function activeDias(cfg){cfg=cfg||state.config;return cfg.dias.filter(d=>d.activo);}
+function labelPeriodo(per,dias,cfg){
+  if(!dias.length)return String(per);
+  return `${per}<br>${periodTime(per,dias[0].horaInicio,cfg,dias[0].nombre)}`;
+}
+function recesoRowsAfter(per,dias,cfg){
+  const aqui=cfg.recesos.filter(r=>r.despues===per);
+  if(!aqui.length)return'';
+  return aqui.map(r=>`<tr><td class="timecol" style="font-size:.68rem">Receso</td>${dias.map(d=>recesoAplicaDia(r,d.nombre)?`<td style="background:var(--line);font-size:.66rem;color:var(--soft);padding:2px">${r.dur} min</td>`:'<td></td>').join('')}</tr>`).join('');
+}
+
+/* ---------- FACULTADES Y CARRERAS ---------- */
+function viewCarreras(){
+  return `<div class="card">
+    <h2>Facultades</h2>
+    <p class="soft">Crea primero las facultades de la institución. Cada carrera y cada curso del catálogo pertenecerán a una de ellas.</p>
+    <div class="row wrap gap8 addrow">
+      <input id="fac_nom" class="inp" placeholder="Nombre de la facultad">
+      <button class="btn sm" onclick="addFacultad()">Agregar facultad</button>
+    </div>
+    <div class="row wrap gap8" style="margin-top:10px">
+      ${state.facultades.map(f=>`<span class="ghost sm">${esc(f.nombre)} <a href="#" onclick="delFacultad('${f.id}');return false;" style="color:var(--c4);text-decoration:none;margin-left:4px">✕</a></span>`).join('')||'<span class="soft">Sin facultades aún</span>'}
+    </div>
+  </div>
+  <div class="card">
+    <h2>Nueva carrera</h2>
+    <p class="soft">Indica cuántos semestres tiene la carrera en total. Más abajo podrás habilitar los que estén activos este período; los cursos de cada semestre se asignan desde la pestaña "Cursos".</p>
+    <div class="row wrap gap8 addrow">
+      <input id="car_nom" class="inp" placeholder="Nombre de la carrera">
+      <select id="car_fac" class="inp"><option value="" ${state.facultades.length===1?'':'selected'}>Facultad</option>${state.facultades.map(f=>`<option value="${f.id}" ${state.facultades.length===1?'selected':''}>${esc(f.nombre)}</option>`).join('')}</select>
+      <input id="car_sem" class="inp sm" type="number" min="1" value="10" placeholder="# semestres">
+      <button class="btn sm" onclick="addCarrera()">Crear carrera</button>
+    </div>
+  </div>
+  ${state.carreras.map(carreraCard).join('')||'<p class="soft">Aún no hay carreras registradas.</p>'}`;
+}
+function addFacultad(){const v=document.getElementById('fac_nom').value.trim();if(!v)return;state.facultades.push({id:uid(),nombre:v});persist();}
+function delFacultad(id){
+  const enUso=state.carreras.some(c=>c.facultadId===id)||state.cursos.some(cu=>cu.facultadId===id);
+  if(enUso){alert('No es posible eliminar esta facultad: hay carreras o cursos que la tienen asignada. Reasígnalos o elimínalos primero.');return;}
+  if(!confirm('¿Eliminar esta facultad?'))return;
+  state.facultades=state.facultades.filter(f=>f.id!==id);
+  persist();
+}
+function addCarrera(){
+  const nom=document.getElementById('car_nom').value.trim();
+  const fac=document.getElementById('car_fac').value;
+  const n=Math.max(1,Number(document.getElementById('car_sem').value)||10);
+  if(!nom){alert('Indica el nombre de la carrera.');return;}
+  state.carreras.push({id:uid(),nombre:nom,facultadId:fac,numSem:n,habilitados:[],semestres:{}});
+  persist();
+}
+function delCarrera(id){if(!confirm('¿Eliminar esta carrera?'))return;state.carreras=state.carreras.filter(c=>c.id!==id);pruneOrphanAsign();persist();}
+function toggleSem(cid,s){const c=state.carreras.find(x=>x.id===cid);const i=c.habilitados.indexOf(s);if(i>=0)c.habilitados.splice(i,1);else c.habilitados.push(s);pruneOrphanAsign();persist();}
+function toggleAllSem(cid,parity){const c=state.carreras.find(x=>x.id===cid);const all=Array.from({length:c.numSem},(_,i)=>i+1).filter(s=>parity==='odd'?s%2===1:s%2===0);for(const s of all)if(!c.habilitados.includes(s))c.habilitados.push(s);persist();}
+
+function carreraCard(c){
+  const fac=state.facultades.find(f=>f.id===c.facultadId);
+  const sems=Array.from({length:c.numSem},(_,i)=>i+1);
+  return `<div class="card">
+    <div class="cardhead">
+      <div><h3>${esc(c.nombre)}</h3><span class="soft">${fac?esc(fac.nombre):'Sin facultad asignada'} · ${c.numSem} semestres</span></div>
+      <button class="ghost danger" onclick="delCarrera('${c.id}')">Eliminar carrera</button>
+    </div>
+    <p class="soft">Impares se habilitan a inicio de año, pares a fin de año.</p>
+    <div class="row wrap gap8">
+      <button class="ghost sm" onclick="toggleAllSem('${c.id}','odd')">Habilitar impares</button>
+      <button class="ghost sm" onclick="toggleAllSem('${c.id}','even')">Habilitar pares</button>
+    </div>
+    <div class="semgrid">${sems.map(s=>`<label class="semchk"><input type="checkbox" ${c.habilitados.includes(s)?'checked':''} onchange="toggleSem('${c.id}',${s})"> Sem ${s}</label>`).join('')}</div>
+    ${c.habilitados.slice().sort((a,b)=>a-b).map(s=>semBlock(c,s)).join('')}
+  </div>`;
+}
+function semBlock(c,s){
+  const ids=c.semestres[s]||[];
+  return `<div class="sembox">
+    <h4>Semestre ${s}</h4>
+    <table class="tbl"><thead><tr><th>Curso</th><th>Créd.</th><th>Lab</th></tr></thead><tbody>
+    ${ids.map(cid=>{const cu=state.cursos.find(x=>x.id===cid);if(!cu)return'';const compartido=usosDe(cu.id,parityOf(s)).length>1;return`<tr><td>${esc(cu.nombre)}${compartido?'<span class="badge shared">compartido</span>':''}</td><td>${cu.creditos}</td><td>${cu.lab?'Sí':'—'}</td></tr>`;}).join('')||'<tr><td colspan="3" class="soft">Sin cursos aún</td></tr>'}
+    </tbody></table>
+    <p class="soft">Los cursos se asignan a este semestre desde la pestaña "Cursos".</p>
+  </div>`;
+}
+function addCursoToSem(cid,s,cuid){
+  const parity=parityOf(s);
+  const a=state.asign.find(x=>x.cursoId===cuid&&x.parity===parity);
+  if(a&&a.docenteId){
+    const otras=state.asign.filter(x=>x.id!==a.id&&x.docenteId===a.docenteId&&x.parity===parity);
+    if(otras.some(o=>seccionesOf(o).includes(cid+'|'+s))){alert('El docente ya asignado a este curso imparte otro curso a esa misma carrera y semestre. No se puede vincular.');render();return;}
+  }
+  const c=state.carreras.find(x=>x.id===cid);
+  if(!c.semestres[s])c.semestres[s]=[];
+  if(!c.semestres[s].includes(cuid))c.semestres[s].push(cuid);
+  persist();
+}
+function toggleAsignCurso(cuid,cid,s,checked){if(checked)addCursoToSem(cid,s,cuid);else quitarCursoDeSem(cid,s,cuid);}
+function quitarCursoDeSem(cid,s,cuid){
+  const c=state.carreras.find(x=>x.id===cid);
+  c.semestres[s]=(c.semestres[s]||[]).filter(x=>x!==cuid);
+  pruneOrphanAsign();
+  persist();
+}
+
+/* ---------- CURSOS (catálogo) ---------- */
+function cursosFiltrados(){
+  let list=state.cursos;
+  if(ui.filtroCarreraId){
+    const car=state.carreras.find(c=>c.id===ui.filtroCarreraId);
+    if(car){
+      if(ui.filtroSem){
+        const s=Number(ui.filtroSem);
+        list=list.filter(cu=>(car.semestres[s]||[]).includes(cu.id));
+      }else{
+        const todos=new Set();
+        for(const s of car.habilitados) for(const cid of (car.semestres[s]||[])) todos.add(cid);
+        list=list.filter(cu=>todos.has(cu.id));
+      }
+    }
+  }
+  return list;
+}
+function viewCursos(){
+  const carFiltro=state.carreras.find(c=>c.id===ui.filtroCarreraId);
+  const semOpts=carFiltro?carFiltro.habilitados.slice().sort((a,b)=>a-b):semestresDisponibles();
+  const lista=cursosFiltrados();
+  return `<div class="card">
+    <h2>Cursos</h2>
+    <p class="soft">Los cursos se crean una sola vez y luego se asignan a los semestres de las carreras de su facultad. Cada curso ocupará tantos períodos por semana como créditos tenga.</p>
+    <div class="row wrap gap8 addrow">
+      <input id="cu_nom" class="inp" placeholder="Nombre del curso">
+      <input id="cu_cred" class="inp sm" type="number" min="1" placeholder="Créditos">
+      <label class="chk"><input type="checkbox" id="cu_lab"> Usa laboratorio</label>
+      <select id="cu_fac" class="inp"><option value="" ${state.facultades.length===1?'':'selected'}>Facultad</option>${state.facultades.map(f=>`<option value="${f.id}" ${state.facultades.length===1?'selected':''}>${esc(f.nombre)}</option>`).join('')}</select>
+      <button class="btn sm" onclick="addCursoCatalogo()">Agregar curso</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Filtrar cursos</h3>
+    <div class="row wrap gap8">
+      <select class="inp" onchange="ui.filtroCarreraId=this.value;ui.filtroSem='';render()">
+        <option value="">Todas las carreras</option>
+        ${state.carreras.map(c=>`<option value="${c.id}" ${ui.filtroCarreraId===c.id?'selected':''}>${esc(c.nombre)}</option>`).join('')}
+      </select>
+      <select class="inp" onchange="ui.filtroSem=this.value;render()">
+        <option value="">Todos los semestres</option>
+        ${semOpts.map(s=>`<option value="${s}" ${String(ui.filtroSem)===String(s)?'selected':''}>Semestre ${s}</option>`).join('')}
+      </select>
+    </div>
+  </div>
+  <div class="filtro-anim">${lista.map(cursoCard).join('')||'<p class="soft">Ningún curso coincide con el filtro, o aún no hay cursos registrados.</p>'}</div>`;
+}
+function cursoCard(cu){
+  const f=state.facultades.find(x=>x.id===cu.facultadId);
+  const carrerasFac=state.carreras.filter(c=>c.facultadId===cu.facultadId);
+  const editando=ui.editandoCurso===cu.id;
+  return `<div class="card">
+    <div class="cardhead">
+      ${editando?`<div class="row wrap gap8">
+        <input id="ecu_nom" class="inp" value="${esc(cu.nombre)}" placeholder="Nombre">
+        <input id="ecu_cred" class="inp sm" type="number" min="1" value="${cu.creditos}" placeholder="Créditos">
+        <label class="chk"><input type="checkbox" id="ecu_lab" ${cu.lab?'checked':''}> Laboratorio</label>
+        <select id="ecu_fac" class="inp">${state.facultades.map(ff=>`<option value="${ff.id}" ${ff.id===cu.facultadId?'selected':''}>${esc(ff.nombre)}</option>`).join('')}</select>
+      </div>`:`<div><h3>${esc(cu.nombre)} ${cu.lab?'<span class="badge lab">laboratorio</span>':''}</h3><span class="soft">${cu.creditos} créd. · ${f?esc(f.nombre):'Sin facultad'}</span></div>`}
+      <div class="row gap8">
+        ${editando?`<button class="btn sm" onclick="guardarCurso('${cu.id}')">Guardar</button><button class="ghost sm" onclick="ui.editandoCurso='';render()">Cancelar</button>`
+          :`<button class="ghost sm" onclick="ui.editandoCurso='${cu.id}';render()">Editar</button><button class="ghost danger sm" onclick="delCursoCatalogo('${cu.id}')">Eliminar</button>`}
+      </div>
+    </div>
+    <p class="soft">Asignar a carreras y semestres. Si el mismo curso se marca en más de una carrera dentro del mismo período (semestres impares o pares), sus secciones se unen automáticamente y comparten un único horario, docente y aula.</p>
+    ${carrerasFac.length?carrerasFac.map(c=>`<div style="margin-bottom:8px">
+        <strong>${esc(c.nombre)}</strong>
+        <div class="row wrap gap8" style="margin-top:3px">${c.habilitados.length?c.habilitados.slice().sort((a,b)=>a-b).map(s=>`<label class="chk"><input type="checkbox" ${(c.semestres[s]||[]).includes(cu.id)?'checked':''} onchange="toggleAsignCurso('${cu.id}','${c.id}',${s},this.checked)"> Sem ${s}</label>`).join(''):'<span class="soft">sin semestres habilitados</span>'}</div>
+      </div>`).join(''):'<p class="soft">No hay carreras registradas en esta facultad.</p>'}
+  </div>`;
+}
+function guardarCurso(id){
+  const cu=state.cursos.find(x=>x.id===id);
+  const nombre=document.getElementById('ecu_nom').value.trim();
+  const creditos=Math.max(1,Number(document.getElementById('ecu_cred').value)||0);
+  const lab=document.getElementById('ecu_lab').checked;
+  const facultadId=document.getElementById('ecu_fac').value;
+  if(!nombre||!creditos||!facultadId){alert('Indica nombre, créditos y facultad válidos.');return;}
+  const enUso=state.carreras.some(c=>Object.values(c.semestres).some(arr=>arr.includes(id)));
+  if(enUso&&facultadId!==cu.facultadId){alert('No puedes cambiar la facultad de un curso ya asignado a carreras. Quítalo primero de esas carreras y semestres.');return;}
+  cu.nombre=nombre;cu.creditos=creditos;cu.lab=lab;cu.facultadId=facultadId;
+  ui.editandoCurso='';
+  persist();
+}
+function addCursoCatalogo(){
+  const nombre=document.getElementById('cu_nom').value.trim();
+  const creditosRaw=document.getElementById('cu_cred').value;
+  const creditos=Math.max(1,Number(creditosRaw)||0);
+  const lab=document.getElementById('cu_lab').checked;
+  const facultadId=document.getElementById('cu_fac').value;
+  if(!nombre||!creditosRaw||!facultadId){alert('Indica nombre, créditos y facultad del curso.');return;}
+  state.cursos.push({id:uid(),nombre,creditos,lab,facultadId});
+  persist();
+}
+function delCursoCatalogo(id){
+  const enUso=state.carreras.some(c=>Object.values(c.semestres).some(arr=>arr.includes(id)));
+  if(enUso&&!confirm('Este curso está asignado a una o más carreras y se quitará de ellas también. ¿Continuar?'))return;
+  if(!enUso&&!confirm('¿Eliminar este curso del catálogo?'))return;
+  for(const c of state.carreras) for(const s in c.semestres) c.semestres[s]=c.semestres[s].filter(x=>x!==id);
+  state.asign=state.asign.filter(a=>a.cursoId!==id);
+  state.cursos=state.cursos.filter(c=>c.id!==id);
+  persist();
+}
+
+/* ---------- DOCENTES ---------- */
+function cargaDocente(pid){
+  const res={impar:[],par:[]};
+  for(const a of state.asign){ if(a.docenteId!==pid)continue; const cu=state.cursos.find(x=>x.id===a.cursoId); if(!cu)continue; res[a.parity].push({nombre:cu.nombre,creditos:cu.creditos}); }
+  return res;
+}
+function cargaTxt(lista){ if(!lista.length)return'—'; const tot=lista.reduce((s,x)=>s+x.creditos,0); return lista.map(x=>esc(x.nombre)+' ('+x.creditos+')').join(', ')+' · Total: '+tot+'/15'; }
+function cargaTxtPlano(lista){ if(!lista.length)return'—'; const tot=lista.reduce((s,x)=>s+x.creditos,0); return lista.map(x=>x.nombre+' ('+x.creditos+')').join(', ')+' · Total: '+tot+'/15'; }
+function toggleConfirmacion(pid,parity,checked){
+  const p=state.profesores.find(x=>x.uid===pid); if(!p)return;
+  if(!p.confirmado) p.confirmado={impar:false,par:false};
+  p.confirmado[parity]=checked;
+  persist();
+}
+function marcarTodosConfirmados(parity){
+  for(const p of state.profesores){
+    if(!cargaDocente(p.uid)[parity].length) continue;
+    if(!p.confirmado) p.confirmado={impar:false,par:false};
+    p.confirmado[parity]=true;
+  }
+  persist();
+}
+function limpiarConfirmaciones(parity){
+  for(const p of state.profesores){ if(p.confirmado) p.confirmado[parity]=false; }
+  persist();
+}
+function textoCarga(p,parity){
+  const lista=cargaDocente(p.uid)[parity];
+  return lista.length?cargaTxt(lista):'<span class="soft">—</span>';
+}
+function celdaConfirmacion(p,parity){
+  const lista=cargaDocente(p.uid)[parity];
+  if(!lista.length) return '<span class="soft">—</span>';
+  const conf=!!(p.confirmado&&p.confirmado[parity]);
+  return `<label class="chk"><input type="checkbox" ${conf?'checked':''} onchange="toggleConfirmacion('${p.uid}','${parity}',this.checked)"> Confirmado</label>`;
+}
+function bannerConfirmacion(parity){
+  const relevantes=state.profesores.filter(p=>cargaDocente(p.uid)[parity].length>0);
+  const total=relevantes.length;
+  if(!total) return '<p class="soft">Ningún docente tiene carga asignada todavía para este período.</p>';
+  const confirmados=relevantes.filter(p=>p.confirmado&&p.confirmado[parity]).length;
+  const listo=confirmados===total;
+  return `<div class="estado-asignacion ${listo?'completo':'pendiente'}">${listo?'✓ Los '+total+' docentes con carga en este período tienen su asignación confirmada.':'⚠ '+confirmados+' de '+total+' docentes con carga confirmada en este período.'}</div>`;
+}
+function parityEnUso(parity){ return state.carreras.some(c=>c.habilitados.some(s=>parityOf(s)===parity)); }
+function cursosSinDocente(){
+  const out=[];
+  for(const car of state.carreras){
+    for(const s of car.habilitados.slice().sort((a,b)=>a-b)){
+      for(const cuid of(car.semestres[s]||[])){
+        const cu=state.cursos.find(x=>x.id===cuid); if(!cu)continue;
+        const{a}=getAsign(car.id,s,cu);
+        if(!a.docenteId) out.push({car,s,cu});
+      }
+    }
+  }
+  return out;
+}
+function cursosSinDocenteHtml(){
+  const lista=cursosSinDocente();
+  if(!lista.length) return '<div class="estado-asignacion completo">✓ Todos los cursos de las carreras y semestres habilitados tienen docente asignado.</div>';
+  const filas=lista.map(({car,s,cu})=>`<tr><td>${esc(car.nombre)}</td><td>${s}</td><td>${esc(cu.nombre)}</td><td>${cu.creditos}</td></tr>`).join('');
+  return `<div class="estado-asignacion" style="background:#b8860b;color:#fff">⚠ ${lista.length} curso(s) sin docente asignado</div>
+    <table class="tbl"><thead><tr><th>Carrera</th><th>Semestre</th><th>Curso</th><th>Créd.</th></tr></thead><tbody>${filas}</tbody></table>`;
+}
+function filasExcelDocentes(){
+  const usaImpar=parityEnUso('impar'),usaPar=parityEnUso('par');
+  const header=['ID','Nombre','Apellido'];
+  if(usaImpar)header.push('Carga (impares)','Confirmado (impares)');
+  if(usaPar)header.push('Carga (pares)','Confirmado (pares)');
+  const filas=[header];
+  for(const p of state.profesores){
+    const carga=cargaDocente(p.uid);
+    const fila=[p.id,p.nombre,p.apellido];
+    if(usaImpar)fila.push(cargaTxtPlano(carga.impar),(p.confirmado&&p.confirmado.impar)?'Sí':'No');
+    if(usaPar)fila.push(cargaTxtPlano(carga.par),(p.confirmado&&p.confirmado.par)?'Sí':'No');
+    filas.push(fila);
+  }
+  return filas;
+}
+function exportarDocentesExcel(){ exportarCsv('Docentes', filasExcelDocentes()); }
+function viewDocentes(){
+  const usaImpar=parityEnUso('impar'),usaPar=parityEnUso('par'),ambos=usaImpar&&usaPar;
+  const periodo=ambos?(ui.docPeriodo||'impar'):(usaImpar?'impar':(usaPar?'par':'impar'));
+  const lblCarga=p=>ambos?(p==='impar'?'Carga (semestres impares)':'Carga (semestres pares)'):'Carga académica';
+  const lblConf=p=>ambos?(p==='impar'?'Confirmado (impares)':'Confirmado (pares)'):'Confirmado';
+  const totalCols=3+(usaImpar?2:0)+(usaPar?2:0);
+  return `<div class="card">
+    <h2>Docentes</h2>
+    <p class="soft">Registra aquí a los docentes; luego podrás asignarlos a los cursos desde la pestaña "Horario". Un docente puede impartir varios cursos en el mismo período académico, siempre que no repita curso con el mismo grupo (misma carrera y semestre), no exceda 15 créditos en total y no tenga traslape de horario.</p>
+    <div class="row wrap gap8 addrow">
+      <input id="pf_id" class="inp sm" placeholder="ID docente">
+      <input id="pf_nom" class="inp" placeholder="Nombre">
+      <input id="pf_ape" class="inp" placeholder="Apellido">
+      <button class="btn sm" onclick="addProfesor()">Agregar docente</button>
+    </div>
+    <div class="row gap8" style="margin-top:10px"><button class="ghost sm" onclick="exportarDocentesExcel()">Exportar a Excel</button></div>
+  </div>
+  <div class="card">
+    <h3>Confirmación de carga académica</h3>
+    <p class="soft">Marca la carga de cada docente como confirmada una vez revisada, según los semestres que tengan habilitados.</p>
+    ${(!usaImpar&&!usaPar)?'<p class="soft">Todavía no hay semestres habilitados en ninguna carrera.</p>':`
+    ${ambos?`<div class="row wrap gap8">
+      <select class="inp" onchange="ui.docPeriodo=this.value;render()">
+        <option value="impar" ${periodo==='impar'?'selected':''}>Semestres impares</option>
+        <option value="par" ${periodo==='par'?'selected':''}>Semestres pares</option>
+      </select>
+    </div>`:''}
+    ${bannerConfirmacion(periodo)}
+    <div class="row wrap gap8">
+      <button class="ghost sm" onclick="marcarTodosConfirmados('${periodo}')">Marcar todos como confirmados</button>
+      <button class="ghost sm" onclick="limpiarConfirmaciones('${periodo}')">Limpiar confirmaciones</button>
+    </div>`}
+  </div>
+  <div class="card">
+    <h3>Cursos sin docente asignado</h3>
+    ${cursosSinDocenteHtml()}
+  </div>
+  <div class="card">
+    <table class="tbl"><thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th>${usaImpar?`<th>${lblCarga('impar')}</th><th>${lblConf('impar')}</th>`:''}${usaPar?`<th>${lblCarga('par')}</th><th>${lblConf('par')}</th>`:''}<th></th></tr></thead><tbody>
+    ${state.profesores.map(p=>{
+      if(ui.editandoDocente===p.uid){
+        return `<tr><td><input class="inp sm" id="edp_id" value="${esc(p.id)}"></td><td><input class="inp sm" id="edp_nom" value="${esc(p.nombre)}"></td><td><input class="inp sm" id="edp_ape" value="${esc(p.apellido)}"></td><td class="soft" colspan="${totalCols-3}">—</td><td><button class="ghost sm" onclick="guardarDocente('${p.uid}')">Guardar</button> <button class="ghost sm" onclick="ui.editandoDocente='';render()">Cancelar</button></td></tr>`;
+      }
+      return `<tr><td>${esc(p.id)}</td><td>${esc(p.nombre)}</td><td>${esc(p.apellido)}</td>${usaImpar?`<td>${textoCarga(p,'impar')}</td><td>${celdaConfirmacion(p,'impar')}</td>`:''}${usaPar?`<td>${textoCarga(p,'par')}</td><td>${celdaConfirmacion(p,'par')}</td>`:''}<td><button class="ghost sm" onclick="ui.editandoDocente='${p.uid}';render()">Editar</button> <button class="ghost danger sm" onclick="delProfesor('${p.uid}')">✕</button></td></tr>`;
+    }).join('')||`<tr><td colspan="${totalCols+1}" class="soft">Sin docentes registrados</td></tr>`}
+    </tbody></table>
+  </div>`;
+}
+function addProfesor(){
+  const id=document.getElementById('pf_id').value.trim();
+  const nom=document.getElementById('pf_nom').value.trim();
+  const ape=document.getElementById('pf_ape').value.trim();
+  if(!id||!nom||!ape){alert('Indica el ID, el nombre y el apellido del docente.');return;}
+  if(state.profesores.some(p=>p.id===id)){alert('Ya existe un docente registrado con ese ID.');return;}
+  state.profesores.push({uid:uid(),id,nombre:nom,apellido:ape});
+  persist();
+}
+function guardarDocente(u){
+  const p=state.profesores.find(x=>x.uid===u);
+  const id=document.getElementById('edp_id').value.trim();
+  const nom=document.getElementById('edp_nom').value.trim();
+  const ape=document.getElementById('edp_ape').value.trim();
+  if(!id||!nom||!ape){alert('Indica el ID, el nombre y el apellido.');return;}
+  if(state.profesores.some(x=>x.uid!==u&&x.id===id)){alert('Ya existe otro docente con ese ID.');return;}
+  p.id=id;p.nombre=nom;p.apellido=ape;
+  ui.editandoDocente='';
+  persist();
+}
+function delProfesor(u){if(!confirm('¿Eliminar este docente?'))return;state.profesores=state.profesores.filter(p=>p.uid!==u);persist();}
+
+/* ---------- HORARIO ---------- */
+function usosDe(cursoId,parity){
+  const out=[];
+  for(const c of state.carreras) for(const s of c.habilitados){ if(parityOf(s)!==parity)continue; if((c.semestres[s]||[]).includes(cursoId)) out.push({carreraId:c.id,sem:s}); }
+  return out;
+}
+function seccionesOf(a){ return usosDe(a.cursoId,a.parity).map(u=>u.carreraId+'|'+u.sem); }
+function pruneOrphanAsign(){ state.asign=state.asign.filter(a=>usosDe(a.cursoId,a.parity).length>0); }
+function cargaTotalDocente(pid,parity,excludeAsignId){
+  return state.asign.filter(x=>x.id!==excludeAsignId&&x.docenteId===pid&&x.parity===parity).reduce((s,x)=>{const c=state.cursos.find(y=>y.id===x.cursoId);return s+(c?c.creditos:0);},0);
+}
+function getAsign(cid,s,cu){
+  const parity=parityOf(s);
+  let a=state.asign.find(a=>a.cursoId===cu.id&&a.parity===parity);
+  if(!a){a={id:uid(),cursoId:cu.id,parity,docenteId:'',aula:'',dist:'distribuido',slots:[]};state.asign.push(a);}
+  return{a,need:cu.creditos};
+}
+function conflictAt(dia,per,a){
+  const others=state.asign.filter(x=>x.id!==a.id&&x.slots.some(sl=>sl.dia===dia&&sl.per===per));
+  if(!others.length)return null;
+  const porDocente=!!(a.docenteId&&others.some(o=>o.docenteId===a.docenteId));
+  const misSecciones=seccionesOf(a);
+  const porSeccion=others.some(o=>seccionesOf(o).some(sec=>misSecciones.includes(sec)));
+  if(porDocente&&porSeccion)return'ambos';
+  if(porDocente)return'docente';
+  if(porSeccion)return'seccion';
+  return null;
+}
+function viewHorario(){
+  const carrerasFac=state.carreras.filter(c=>!ui.selFacultad||c.facultadId===ui.selFacultad);
+  const car=state.carreras.find(c=>c.id===ui.selCarrera);
+  const semOpts=car?car.habilitados.slice().sort((a,b)=>a-b):[];
+  let html=`<div class="card">
+    <h2>Selecciona carrera y semestre</h2>
+    <p class="soft">Elige una carrera y uno de sus semestres habilitados para programar sus cursos. Haz clic en las celdas de la cuadrícula para asignar períodos; el sistema impedirá elegir horarios que choquen con el docente o con la misma sección. Para ver el horario completo por carrera, por semestre o por docente, usa la pestaña "Resumen".</p>
+    <div class="row wrap gap8">
+      <select class="inp" onchange="ui.selFacultad=this.value;ui.selCarrera='';ui.selSem='';render()">
+        <option value="">Todas las facultades</option>
+        ${state.facultades.map(f=>`<option value="${f.id}" ${ui.selFacultad===f.id?'selected':''}>${esc(f.nombre)}</option>`).join('')}
+      </select>
+      <select class="inp" onchange="ui.selCarrera=this.value;ui.selSem='';render()">
+        <option value="">Selecciona carrera</option>
+        ${carrerasFac.map(c=>`<option value="${c.id}" ${ui.selCarrera===c.id?'selected':''}>${esc(c.nombre)}</option>`).join('')}
+      </select>
+      ${car?`<select class="inp" onchange="ui.selSem=this.value;render()">
+        <option value="">Selecciona semestre</option>
+        ${semOpts.map(s=>`<option value="${s}" ${String(ui.selSem)===String(s)?'selected':''}>Semestre ${s}</option>`).join('')}
+      </select>`:''}
+    </div>
+  </div>`;
+  if(car&&ui.selSem){
+    const s=Number(ui.selSem);
+    const ids=car.semestres[s]||[];
+    if(!ids.length) html+='<p class="soft">Este semestre aún no tiene cursos. Asígnalos desde la pestaña "Cursos".</p>';
+    else html+=resumenSemestreHorario(car,s,ids);
+    html+=ids.map(cuid=>{const cu=state.cursos.find(x=>x.id===cuid);return cu?cursoScheduler(car,s,cu):'';}).join('');
+    html+=weekOverview(car,s,PALETA_RESUMEN);
+  }
+  return html;
+}
+function resumenSemestreHorario(car,s,ids){
+  let totalCred=0,completos=0,sinDocente=0;
+  const filas=ids.map(cuid=>{
+    const cu=state.cursos.find(x=>x.id===cuid); if(!cu)return'';
+    const{a,need}=getAsign(car.id,s,cu);
+    totalCred+=cu.creditos;
+    const done=a.slots.length>=need; if(done)completos++;
+    if(!a.docenteId)sinDocente++;
+    const docNom=a.docenteId?(()=>{const p=state.profesores.find(x=>x.uid===a.docenteId);return p?esc(p.nombre)+' '+esc(p.apellido):'';})():'<span class="soft">Sin asignar</span>';
+    return `<tr${a.docenteId?'':' style="background:rgba(184,134,11,.15)"'}><td>${esc(cu.nombre)}</td><td>${cu.creditos}</td><td>${docNom}</td><td><span class="badge ${done?'completo':'pendiente'}">${a.slots.length}/${need}</span></td></tr>`;
+  }).join('');
+  return `<div class="card">
+    <h3>Resumen — ${esc(car.nombre)}, semestre ${s}</h3>
+    ${sinDocente>0?`<div class="estado-asignacion pendiente">⚠ ${sinDocente} curso(s) de este semestre aún no tienen docente asignado.</div>`:''}
+    <table class="tbl"><thead><tr><th>Curso</th><th>Créd.</th><th>Docente</th><th>Períodos</th></tr></thead><tbody>${filas}</tbody></table>
+    <p class="soft">${completos} de ${ids.length} curso(s) con todos sus períodos asignados · ${totalCred} créditos totales en el semestre</p>
+  </div>`;
+}
+function cursoScheduler(car,s,cu){
+  const{a,need}=getAsign(car.id,s,cu);
+  const dias=activeDias();
+  const maxP=Math.max(1,...dias.map(d=>d.periodos));
+  const usos=usosDe(cu.id,a.parity);
+  const shared=usos.length>1;
+  const completo=a.slots.length>=need;
+  return `<div class="card">
+    <div class="cardhead">
+      <div><h3>${esc(cu.nombre)} ${shared?'<span class="badge shared">compartido</span>':''} ${cu.lab?'<span class="badge lab">laboratorio</span>':''}</h3>
+      <span class="soft">${cu.creditos} créditos → ${need} período(s) por semana</span></div>
+      <span class="badge ${completo?'completo':'pendiente'}">${a.slots.length}/${need}</span>
+    </div>
+    ${!a.docenteId?'<div class="estado-asignacion" style="background:#b8860b;color:#fff">⚠ Este curso todavía no tiene un docente asignado.</div>':''}
+    <div class="row wrap gap8">
+      <select class="inp" onchange="assignDocente('${a.id}',this.value)">
+        <option value="">Docente</option>
+        ${state.profesores.map(p=>`<option value="${p.uid}" ${a.docenteId===p.uid?'selected':''}>${esc(p.nombre)} ${esc(p.apellido)} (${cargaTotalDocente(p.uid,a.parity,a.id)}/15 créd.)</option>`).join('')}
+      </select>
+      ${cu.lab?`<input class="inp" placeholder="Aula / laboratorio" value="${esc(a.aula)}" onchange="setAsign('${a.id}','aula',this.value)">`:''}
+      <select class="inp" onchange="setAsign('${a.id}','dist',this.value)">
+        <option value="distribuido" ${a.dist==='distribuido'?'selected':''}>Distribuido en la semana</option>
+        <option value="bloque" ${a.dist==='bloque'?'selected':''}>En un solo bloque</option>
+      </select>
+    </div>
+    ${shared?`<p class="soft">Se comparte con: ${usos.filter(u=>!(u.carreraId===car.id&&u.sem===s)).map(u=>{const c2=state.carreras.find(x=>x.id===u.carreraId);return c2?esc(c2.nombre)+' (Sem '+u.sem+')':'';}).join(', ')}</p>`:''}
+    <p class="progreso-linea">${completo?`✓ <span class="badge completo">Completo</span> — ${a.slots.length}/${need} período(s) asignado(s)`:`⚠ <span class="badge pendiente">Pendiente</span> — faltan ${need-a.slots.length} de ${need} período(s) por asignar`}</p>
+    <div class="leyenda">
+      <span><i style="background:var(--c1)"></i> Seleccionado</span>
+      <span><i style="background:#af4035"></i> No disponible: sección ocupada</span>
+      <span><i style="background:#b8860b"></i> No disponible: docente ocupado</span>
+      <span><i style="background:repeating-linear-gradient(45deg,#af4035,#af4035 4px,#b8860b 4px,#b8860b 8px)"></i> No disponible: ambas razones</span>
+    </div>
+    <div class="gridwrap"><table class="grid"><thead><tr><th>Período</th>${dias.map(d=>`<th>${d.nombre}<br><span style="font-weight:400">desde ${d.horaInicio}</span></th>`).join('')}</tr></thead><tbody>
+    ${Array.from({length:maxP},(_,i)=>i+1).map(per=>`<tr><td class="timecol">${labelPeriodo(per,dias,state.config)}</td>${dias.map(d=>{
+      if(per>d.periodos) return '<td><button class="cell off" disabled></button></td>';
+      const mine=a.slots.some(sl=>sl.dia===d.nombre&&sl.per===per);
+      const conf=mine?null:conflictAt(d.nombre,per,a);
+      const claseConf=conf?'busy-'+conf:'';
+      const titulo=conf==='ambos'?'No disponible: el docente ya tiene clase Y esta sección ya tiene una clase en este período':conf==='docente'?'No disponible: el docente ya tiene clase en este período':conf==='seccion'?'No disponible: esta sección ya tiene una clase en este período':'';
+      return `<td><button class="cell ${mine?'on':''} ${claseConf}" title="${titulo}" ${conf?'disabled':''} onclick="toggleSlot('${a.id}','${d.nombre}',${per},${need})">${mine?'●':''}</button></td>`;
+    }).join('')}</tr>${recesoRowsAfter(per,dias,state.config)}`).join('')}
+    </tbody></table></div>
+  </div>`;
+}
+function setAsign(aid,field,val){const a=state.asign.find(x=>x.id===aid);a[field]=val;persist();}
+function assignDocente(aid,docId){
+  const a=state.asign.find(x=>x.id===aid);
+  if(!docId){a.docenteId='';persist();return;}
+  const cu=state.cursos.find(x=>x.id===a.cursoId);
+  const misSecciones=seccionesOf(a);
+  const otros=state.asign.filter(x=>x.id!==aid&&x.docenteId===docId&&x.parity===a.parity&&x.cursoId!==a.cursoId);
+  const mismoGrupo=otros.some(o=>seccionesOf(o).some(sec=>misSecciones.includes(sec)));
+  if(mismoGrupo){alert('Este docente ya imparte otro curso a ese mismo grupo de estudiantes (misma carrera y semestre).');render();return;}
+  const totalCred=cargaTotalDocente(docId,a.parity,aid)+(cu?cu.creditos:0);
+  if(totalCred>15){alert('Este docente superaría el máximo de 15 créditos en este período académico (quedaría en '+totalCred+' créditos).');render();return;}
+  a.docenteId=docId;persist();
+}
+function toggleSlot(aid,dia,per,need){
+  const a=state.asign.find(x=>x.id===aid);
+  const idx=a.slots.findIndex(sl=>sl.dia===dia&&sl.per===per);
+  if(idx>=0){a.slots.splice(idx,1);persist();return;}
+  const conf=conflictAt(dia,per,a);
+  if(conf){alert('Conflicto de horario: '+(conf==='ambos'?'el docente ya tiene clase Y la sección ya tiene una clase asignada en este período.':conf==='docente'?'el docente ya tiene clase en este período.':'la sección ya tiene una clase asignada en este período.'));return;}
+  if(a.slots.length>=need){if(!confirm('Ya se asignaron los '+need+' períodos requeridos. ¿Agregar uno más de todas formas?'))return;}
+  a.slots.push({dia,per});persist();
+}
+const PALETA=[{bg:'var(--c1)',fg:'#fff'},{bg:'var(--c2)',fg:'#0A2A00'},{bg:'var(--c4)',fg:'#fff'},{bg:'var(--c3)',fg:'#2A2A00'}];
+function courseColorIndex(cursoId){ const i=state.cursos.findIndex(c=>c.id===cursoId); return i>=0?i:0; }
+function buildColorMap(items,paleta){
+  const ids=[]; for(const a of items) if(ids.indexOf(a.cursoId)<0) ids.push(a.cursoId);
+  const used=new Set(), map={}, pendientes=[];
+  for(const id of ids){
+    const base=courseColorIndex(id)%paleta.length;
+    if(!used.has(base)){ map[id]=paleta[base]; used.add(base); }
+    else pendientes.push(id);
+  }
+  for(const id of pendientes){
+    let i=0; while(used.has(i%paleta.length)) i++;
+    const idx=i%paleta.length; map[id]=paleta[idx]; used.add(idx);
+  }
+  return map;
+}
+function weekOverview(car,s,paleta){
+  paleta=paleta||PALETA;
+  const dias=activeDias(),maxP=Math.max(1,...dias.map(d=>d.periodos));
+  const items=state.asign.filter(a=>seccionesOf(a).includes(car.id+'|'+s));
+  const colores=buildColorMap(items,paleta);
+  const label=a=>{const cu=state.cursos.find(x=>x.id===a.cursoId);return cu?cu.nombre:'';};
+  const docNom=id=>{const p=state.profesores.find(x=>x.uid===id);return p?p.nombre+(p.apellido?' '+p.apellido:''):'';};
+  return `<div class="card"><div class="cardhead"><h2>Vista semanal — ${esc(car.nombre)}, semestre ${s}</h2><button class="ghost sm" onclick="exportarHorarioExcel('carrera','${car.id}',${s})">Exportar a Excel</button></div>
+  <div class="gridwrap"><table class="grid"><thead><tr><th>Período</th>${dias.map(d=>`<th>${d.nombre}<br><span style="font-weight:400">desde ${d.horaInicio}</span></th>`).join('')}</tr></thead><tbody>
+  ${Array.from({length:maxP},(_,i)=>i+1).map(per=>`<tr><td class="timecol">${labelPeriodo(per,dias,state.config)}</td>${dias.map(d=>{
+    if(per>d.periodos) return '<td></td>';
+    const a=items.find(x=>x.slots.some(sl=>sl.dia===d.nombre&&sl.per===per));
+    if(!a)return'<td></td>';
+    const col=colores[a.cursoId];
+    return `<td style="background:${col.bg};color:${col.fg};font-size:.7rem;padding:3px"><strong>${esc(label(a))}</strong><br>${esc(docNom(a.docenteId))}</td>`;
+  }).join('')}</tr>${recesoRowsAfter(per,dias,state.config)}`).join('')}
+  </tbody></table></div></div>`;
+}
+
+/* ---------- RESUMEN ---------- */
+const PALETA_RESUMEN=[{bg:'#3B82F6',fg:'#fff'},{bg:'#EF4444',fg:'#fff'},{bg:'#10B981',fg:'#fff'},{bg:'#F59E0B',fg:'#1F1300'},{bg:'#8B5CF6',fg:'#fff'},{bg:'#F97316',fg:'#fff'},{bg:'#06B6D4',fg:'#fff'},{bg:'#EC4899',fg:'#fff'},{bg:'#84CC16',fg:'#1A2400'},{bg:'#6366F1',fg:'#fff'},{bg:'#EAB308',fg:'#2B2400'},{bg:'#14B8A6',fg:'#fff'},{bg:'#D946EF',fg:'#fff'},{bg:'#22C55E',fg:'#fff'},{bg:'#0EA5E9',fg:'#fff'},{bg:'#F43F5E',fg:'#fff'},{bg:'#A855F7',fg:'#fff'},{bg:'#92400E',fg:'#fff'}];
+function semestresDisponibles(){const set=new Set();for(const c of state.carreras)for(const s of c.habilitados)set.add(s);return Array.from(set).sort((a,b)=>a-b);}
+function viewResumen(){
+  let html=`<div class="card">
+    <h2>Resumen de horarios</h2>
+    <p class="soft">Cada combinación de carrera y semestre se muestra en su propia tabla, sin combinarse con otras. Busca por carrera (todos sus semestres habilitados), por semestre (todas las carreras que lo tengan habilitado), o consulta el horario completo de un docente.</p>
+  </div>
+  <div class="card">
+    <h3>Resumen por carrera</h3>
+    <div class="row wrap gap8">
+      <select class="inp" onchange="ui.resCarId=this.value;render()">
+        <option value="">Selecciona una carrera</option>
+        ${state.carreras.map(c=>`<option value="${c.id}" ${ui.resCarId===c.id?'selected':''}>${esc(c.nombre)}</option>`).join('')}
+      </select>
+    </div>
+  </div>`;
+  if(ui.resCarId){
+    const car=state.carreras.find(c=>c.id===ui.resCarId);
+    const sems=car?car.habilitados.slice().sort((a,b)=>a-b):[];
+    html+=`<div class="filtro-anim">${sems.length?sems.map(s=>weekOverview(car,s,PALETA_RESUMEN)).join(''):'<p class="soft">Esta carrera no tiene semestres habilitados.</p>'}</div>`;
+  }
+  html+=`<div class="card">
+    <h3>Resumen por semestre</h3>
+    <div class="row wrap gap8">
+      <select class="inp" onchange="ui.resSemNum=this.value;render()">
+        <option value="">Selecciona un semestre</option>
+        ${semestresDisponibles().map(s=>`<option value="${s}" ${String(ui.resSemNum)===String(s)?'selected':''}>Semestre ${s}</option>`).join('')}
+      </select>
+    </div>
+  </div>`;
+  if(ui.resSemNum){
+    const s=Number(ui.resSemNum);
+    const carrerasConSem=state.carreras.filter(c=>c.habilitados.includes(s));
+    html+=`<div class="filtro-anim">${carrerasConSem.length?carrerasConSem.map(c=>weekOverview(c,s,PALETA_RESUMEN)).join(''):'<p class="soft">Ninguna carrera tiene este semestre habilitado.</p>'}</div>`;
+  }
+  const usaImparD=parityEnUso('impar'),usaParD=parityEnUso('par'),ambosD=usaImparD&&usaParD;
+  const periodoDoc=ambosD?ui.resDocPeriodo:(usaImparD?'impar':(usaParD?'par':'impar'));
+  html+=`<div class="card">
+    <h3>Resumen por docente</h3>
+    <div class="row wrap gap8">
+      <select class="inp" onchange="ui.resDocId=this.value;render()">
+        <option value="">Selecciona un docente</option>
+        ${state.profesores.map(p=>`<option value="${p.uid}" ${ui.resDocId===p.uid?'selected':''}>${esc(p.nombre)} ${esc(p.apellido)}</option>`).join('')}
+      </select>
+      ${ambosD?`<select class="inp" onchange="ui.resDocPeriodo=this.value;render()">
+        <option value="impar" ${periodoDoc==='impar'?'selected':''}>Semestres impares</option>
+        <option value="par" ${periodoDoc==='par'?'selected':''}>Semestres pares</option>
+      </select>`:''}
+    </div>
+  </div>`;
+  if(ui.resDocId) html+=docenteGrid(ui.resDocId,periodoDoc);
+  html+=`<div class="card">
+    <h3>Todos los horarios</h3>
+    <p class="soft">Consulta o exporta de una sola vez los horarios de todas las carreras y semestres habilitados que ya tengan cursos.</p>
+    <div class="row wrap gap8">
+      <button class="ghost sm" onclick="ui.verTodos=!ui.verTodos;render()">${ui.verTodos?'Ocultar todos los horarios':'Ver todos los horarios'}</button>
+      <button class="ghost sm" onclick="exportarTodoExcel()">Exportar todo a Excel</button>
+    </div>
+    <p class="soft" style="margin-top:10px">Listado plano (carrera, semestre, curso, horario, ID docente, docente asignado), para toda la semana o para un día específico:</p>
+    <div class="row wrap gap8">
+      <button class="ghost sm" onclick="exportarListadoDocentesExcel()">Exportar listado de cursos y docentes</button>
+    </div>
+    <div class="row wrap gap8" style="margin-top:6px">
+      <select class="inp" id="sel_dia_listado"><option value="">Selecciona un día</option>${activeDias().map(d=>`<option value="${d.nombre}">${d.nombre}</option>`).join('')}</select>
+      <button class="ghost sm" onclick="exportarListadoPorDiaExcel()">Exportar cursos del día</button>
+    </div>
+  </div>`;
+  if(ui.verTodos){
+    const combos=todasLasCombinaciones();
+    html+=combos.length?combos.map(c=>weekOverview(c.car,c.sem,PALETA_RESUMEN)).join(''):'<p class="soft">Todavía no hay carreras con semestres habilitados y cursos asignados.</p>';
+  }
+  return html;
+}
+function todasLasCombinaciones(){
+  const combos=[];
+  for(const c of state.carreras) for(const s of c.habilitados.slice().sort((a,b)=>a-b)) if((c.semestres[s]||[]).length) combos.push({car:c,sem:s});
+  return combos;
+}
+function exportarTodoExcel(){
+  const combos=todasLasCombinaciones();
+  if(!combos.length){ alert('Todavía no hay carreras con semestres habilitados y cursos asignados.'); return; }
+  let filas=[];
+  for(const{car,sem}of combos){
+    filas.push([car.nombre+' — Semestre '+sem]);
+    filas=filas.concat(filasExcelCarreraSem(car,sem));
+    filas.push([]);
+  }
+  exportarCsv('Todos los horarios',filas);
+}
+function formatSlotsConsolidado(slots){
+  const porDia={};
+  for(const sl of slots){ (porDia[sl.dia]=porDia[sl.dia]||[]).push(sl.per); }
+  const partes=[];
+  for(const diaNombre of DIAS){
+    if(!porDia[diaNombre]) continue;
+    const dc=state.config.dias.find(d=>d.nombre===diaNombre);
+    if(!dc) continue;
+    const periodos=porDia[diaNombre].slice().sort((a,b)=>a-b);
+    const rangos=[];
+    let ini=periodos[0],fin=periodos[0];
+    for(let i=1;i<periodos.length;i++){
+      if(periodos[i]===fin+1){ fin=periodos[i]; }
+      else{ rangos.push([ini,fin]); ini=periodos[i]; fin=periodos[i]; }
+    }
+    rangos.push([ini,fin]);
+    const horas=rangos.map(([p1,p2])=>{
+      const tIni=periodTime(p1,dc.horaInicio,state.config,diaNombre).split('–')[0];
+      const tFin=periodTime(p2,dc.horaInicio,state.config,diaNombre).split('–')[1];
+      return tIni+'–'+tFin;
+    }).join(', ');
+    partes.push(diaNombre+' '+horas);
+  }
+  return partes.join(', ');
+}
+function filasListadoCursos(diaFiltro){
+  const filas=[['Carrera','Semestre','Curso','Horario','ID docente','Docente asignado']];
+  for(const car of state.carreras){
+    for(const s of car.habilitados.slice().sort((a,b)=>a-b)){
+      for(const cuid of(car.semestres[s]||[])){
+        const cu=state.cursos.find(x=>x.id===cuid); if(!cu)continue;
+        const{a}=getAsign(car.id,s,cu);
+        let slots=a.slots;
+        if(diaFiltro) slots=slots.filter(sl=>sl.dia===diaFiltro);
+        if(diaFiltro&&!slots.length) continue;
+        const horario=slots.length?formatSlotsConsolidado(slots):'Sin horario asignado';
+        const p=a.docenteId?state.profesores.find(x=>x.uid===a.docenteId):null;
+        filas.push([car.nombre,String(s),cu.nombre,horario,p?p.id:'',p?p.nombre+' '+p.apellido:'Sin asignar']);
+      }
+    }
+  }
+  return filas;
+}
+function exportarListadoDocentesExcel(){
+  const filas=filasListadoCursos(null);
+  if(filas.length<2){ alert('Todavía no hay cursos asignados a carreras con semestres habilitados.'); return; }
+  exportarCsv('Cursos y docentes asignados',filas);
+}
+function exportarListadoPorDiaExcel(){
+  const dia=document.getElementById('sel_dia_listado').value;
+  if(!dia){ alert('Selecciona un día.'); return; }
+  const filas=filasListadoCursos(dia);
+  if(filas.length<2){ alert('No hay cursos con horario asignado ese día.'); return; }
+  exportarCsv('Cursos del '+dia,filas);
+}
+function docenteGrid(pid,periodo){
+  const dias=activeDias(),maxP=Math.max(1,...dias.map(d=>d.periodos));
+  const items=state.asign.filter(a=>a.parity===periodo&&a.docenteId===pid);
+  const colores=buildColorMap(items,PALETA_RESUMEN);
+  const label=a=>{const cu=state.cursos.find(x=>x.id===a.cursoId);return cu?cu.nombre:'';};
+  const scopeTxt=a=>usosDe(a.cursoId,a.parity).map(u=>{const c=state.carreras.find(x=>x.id===u.carreraId);return(c?esc(c.nombre):'')+' S'+u.sem;}).join(', ');
+  const p=state.profesores.find(x=>x.uid===pid);
+  return `<div class="card">
+    <div class="cardhead"><h4>${esc(p?p.nombre+' '+p.apellido:'')} — ${periodo==='impar'?'semestres impares':'semestres pares'}</h4><button class="ghost sm" onclick="exportarHorarioExcel('docente','${pid}','${periodo}')">Exportar a Excel</button></div>
+    <div class="gridwrap"><table class="grid"><thead><tr><th>Período</th>${dias.map(d=>`<th>${d.nombre}<br><span style="font-weight:400">desde ${d.horaInicio}</span></th>`).join('')}</tr></thead><tbody>
+    ${Array.from({length:maxP},(_,i)=>i+1).map(per=>`<tr><td class="timecol">${labelPeriodo(per,dias,state.config)}</td>${dias.map(d=>{
+      if(per>d.periodos) return '<td></td>';
+      const here=items.filter(a=>a.slots.some(sl=>sl.dia===d.nombre&&sl.per===per));
+      if(!here.length) return '<td></td>';
+      return `<td style="padding:2px">${here.map(a=>{const col=colores[a.cursoId];return `<div style="background:${col.bg};color:${col.fg};font-size:.66rem;border-radius:2px;padding:2px 3px;margin-bottom:2px;text-align:left"><strong>${esc(label(a))}</strong><br>${scopeTxt(a)}</div>`;}).join('')}</td>`;
+    }).join('')}</tr>${recesoRowsAfter(per,dias,state.config)}`).join('')}
+    </tbody></table></div>
+  </div>`;
+}
+
+boot();
+</script>
+</body>
+</html>
